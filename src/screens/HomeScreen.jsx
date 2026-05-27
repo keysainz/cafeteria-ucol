@@ -4,6 +4,7 @@ import { useStore } from '../store';
 import { getLevelInfo, BADGES, CHALLENGES, PRODUCTS, getChallengeProgress } from '../data/catalog';
 import { PageHeader, SectionTitle, ProgressBar, IconButton } from '../components/ui';
 import { announce, sounds } from '../components/A11yPanel';
+import { haptic } from '../utils/haptics';
 
 const container = {
   hidden: {},
@@ -15,7 +16,7 @@ const fadeUp = {
 };
 
 export function HomeScreen() {
-  const { user, badges, notifs, navigate, addToCart } = useStore();
+  const { user, badges, notifs, navigate, addToCart, a11y } = useStore();
   const li = getLevelInfo(user.xp);
   const hour = new Date().getHours();
   const greeting = hour < 12 ? 'Buenos días' : hour < 18 ? 'Buenas tardes' : 'Buenas noches';
@@ -50,7 +51,12 @@ export function HomeScreen() {
               className="w-full bg-brown rounded-[18px] p-4 flex items-center gap-4 text-left
                 shadow-[0_4px_20px_rgba(44,21,8,.22)] active:scale-[.975] transition-transform"
               whileTap={{ scale: 0.975 }}
-              onClick={() => { addToCart(combo); sounds.play('add'); announce(`${combo.name} agregado al carrito`); }}
+              onClick={() => {
+                addToCart(combo);
+                if (a11y['a11y-haptic']) haptic(true, [40, 20, 40]);
+                sounds.play('add');
+                announce(`${combo.name} agregado al carrito`);
+              }}
               aria-label={`${combo.name}, $${combo.price}, +${combo.xp} XP. Toca para agregar al carrito.`}
             >
               {/* Ícono */}

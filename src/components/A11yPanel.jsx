@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Accessibility, Volume2, VolumeX, Eye, Moon, Sun, ZoomIn, Type, Maximize2, Minimize2, X } from 'lucide-react';
 import { useStore } from '../store';
+import { haptic } from '../utils/haptics';
 
 /* ─── Opciones del panel ─────────────────────────────────────
    Siguiendo el documento:
@@ -104,8 +105,6 @@ class SoundEngine {
     return this._ctx;
   }
   play(type = 'confirm') {
-    // Vibrate if haptics are enabled in settings, independent of sounds state.
-    try { haptic([30]); } catch (_) {}
     if (!this._enabled) return;
     try {
       const ctx = this._ctx_get();
@@ -130,14 +129,6 @@ class SoundEngine {
 
 export const sounds = new SoundEngine();
 
-/* ─── Haptics ────────────────────────────────────────────────*/
-export function haptic(pattern = [30]) {
-  try {
-    const a11yState = useStore.getState().a11y || {};
-    if (!a11yState['a11y-haptic']) return;
-    if (navigator && navigator.vibrate) navigator.vibrate(pattern);
-  } catch (_) {}
-}
 
 /* ─── Live region helper ─────────────────────────────────────*/
 export function announce(msg) {

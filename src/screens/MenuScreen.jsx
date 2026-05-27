@@ -7,9 +7,10 @@ import { CUSTOMIZATIONS } from '../data/customizations';
 import { ProductCard, ProductIllustration } from '../components/ProductCard';
 import { Chip, BottomSheet, Button, EmptyState } from '../components/ui';
 import { announce, sounds } from '../components/A11yPanel';
+import { haptic } from '../utils/haptics';
 
 export function MenuScreen() {
-  const { currentCat, setCat, navigate, favs, addToCart, toggleFav } = useStore();
+  const { currentCat, setCat, navigate, favs, addToCart, toggleFav, a11y } = useStore();
   const [search, setSearch] = useState('');
   const [modal, setModal] = useState(null);
 
@@ -228,6 +229,7 @@ export function MenuScreen() {
               <Button variant="secondary" className="flex-1"
                 onClick={() => {
                   toggleFav(modal.id);
+                  if (a11y['a11y-haptic']) haptic(true, [40, 20, 40]);
                   sounds.play('favorite');
                   announce(favs.has(modal.id) ? `${modal.name} eliminado de favoritos` : `${modal.name} guardado en favoritos`);
                 }}>
@@ -238,6 +240,7 @@ export function MenuScreen() {
                   const selArr = Array.isArray(selectedCustomization) ? selectedCustomization : [];
                   const customization = [...selArr, ...(customNote.trim() ? [customNote.trim()] : [])].join(', ');
                   addToCart(modal, customization);
+                  if (a11y['a11y-haptic']) haptic(true, [40, 20, 40]);
                   sounds.play('add');
                   setModal(null);
                   const customText = customization ? `. Con personalizaciones: ${customization}` : '. Sin personalizaciones';

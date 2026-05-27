@@ -6,9 +6,10 @@ import { SLOTS } from '../data/catalog';
 import { Button, StatusPill, AlertDialog, EmptyState } from '../components/ui';
 import { ProductThumb } from '../components/ProductCard';
 import { announce, sounds } from '../components/A11yPanel';
+import { haptic } from '../utils/haptics';
 
 export function CartScreen() {
-  const { cart, changeQty, clearCart, confirmOrder, selectedSlot, setSlot, navigate, showToast } = useStore();
+  const { cart, changeQty, clearCart, confirmOrder, selectedSlot, setSlot, navigate, showToast, a11y } = useStore();
   const [confirmClear, setConfirmClear] = useState(false);
   const [ordering, setOrdering] = useState(false);
   const [showReview, setShowReview] = useState(false);
@@ -36,6 +37,7 @@ export function CartScreen() {
     try {
       const result = await confirmOrder();
       useStore.setState({ _lastOrder: result });
+      if (a11y['a11y-haptic']) haptic(true, [60, 20, 60]);
       sounds.play('confirm');
       const orderSummary = items.map(i => {
         const customText = i.customization ? `, con ${i.customization}` : '';

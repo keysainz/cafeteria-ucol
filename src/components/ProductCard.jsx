@@ -4,9 +4,10 @@ import { clsx } from 'clsx';
 import { useStore } from '../store';
 import { CATEGORIES } from '../data/catalog';
 import { announce, sounds } from './A11yPanel';
+import { haptic } from '../utils/haptics';
 
 export function ProductCard({ product, onOpenModal }) {
-  const { favs, addToCart, toggleFav } = useStore();
+  const { favs, addToCart, toggleFav, a11y } = useStore();
   const isFav = favs.has(product.id);
 
   return (
@@ -35,7 +36,13 @@ export function ProductCard({ product, onOpenModal }) {
       <motion.button
         className="absolute top-2.5 right-2.5 z-10 w-9 h-9 rounded-full bg-white/95 border border-cream-border shadow-sm flex items-center justify-center transition-colors duration-200 hover:bg-accent/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
         whileTap={{ scale: 0.75 }}
-        onClick={e => { e.stopPropagation(); toggleFav(product.id); sounds.play('favorite'); announce(isFav ? `${product.name} eliminado de favoritos` : `${product.name} guardado en favoritos`); }}
+        onClick={e => {
+          e.stopPropagation();
+          toggleFav(product.id);
+          if (a11y['a11y-haptic']) haptic(true, [40, 20, 40]);
+          sounds.play('favorite');
+          announce(isFav ? `${product.name} eliminado de favoritos` : `${product.name} guardado en favoritos`);
+        }}
         aria-label={isFav ? `Quitar ${product.name} de favoritos` : `Agregar ${product.name} a favoritos`}
         aria-pressed={isFav}
       >
@@ -60,7 +67,13 @@ export function ProductCard({ product, onOpenModal }) {
         className="product-add-btn absolute bottom-2.5 right-2.5 w-[28px] h-[28px] rounded-full bg-accent
           flex items-center justify-center shadow-[0_2px_8px_rgba(200,88,32,.35)]"
         whileTap={{ scale: 0.82 }}
-        onClick={e => { e.stopPropagation(); addToCart(product); sounds.play('add'); announce(`${product.name} agregado`); }}
+        onClick={e => {
+          e.stopPropagation();
+          addToCart(product);
+          if (a11y['a11y-haptic']) haptic(true, [40, 20, 40]);
+          sounds.play('add');
+          announce(`${product.name} agregado`);
+        }}
         aria-label={`Agregar ${product.name} al carrito`}
       >
         <Plus size={14} strokeWidth={2.5} className="text-white" />
